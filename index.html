@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<meta charset="utf-8">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#b9583a">
@@ -121,11 +122,12 @@ section{padding:5.5rem 1.5rem;max-width:640px;margin:auto}
 /* galerie */
 #galerie{max-width:none;background:var(--br);color:var(--cr);padding-left:0;padding-right:0}
 #galerie h2{color:var(--cr)}
-.gal{display:flex;flex-direction:column;gap:1.2rem;padding:2rem 1.5rem 0;max-width:640px;margin:auto}
-.g{overflow:hidden;border-radius:4px;height:min(110vw,520px);position:relative}
-.g:nth-child(even){width:84%;align-self:flex-end}
-.g:nth-child(odd){width:90%}
-.g img{width:100%;height:125%;object-fit:cover;position:absolute;top:-12.5%;will-change:transform}
+.gal{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:2rem 1.2rem 0;max-width:640px;margin:auto}
+.g{margin:0;padding:.5rem;background:var(--cr);border-radius:3px;box-shadow:0 12px 32px #0007}
+.g .ph{position:relative;overflow:hidden;aspect-ratio:2/3}
+.g.big{grid-column:1/-1}.g.big .ph{aspect-ratio:4/5}
+.g.dec{margin-top:2.4rem}
+.g img{position:absolute;left:0;top:-9%;width:100%;height:118%;object-fit:cover;object-position:center 30%;will-change:transform}
 
 /* programme */
 .prog{margin-top:2.2rem}
@@ -161,6 +163,12 @@ footer .hash{font:500 .8rem Cinzel,serif;letter-spacing:.22em}
 #mus svg{width:20px;height:20px}
 #mus.off .on,#mus:not(.off) .offi{display:none}
 
+/* livre d'or */
+#mf{text-align:left}
+#mf input,#mf textarea{display:block;width:100%;margin-bottom:.9rem;padding:.9rem;font:400 16px Jost,sans-serif;color:var(--br);background:#fff9;border:1px solid #b9583a66;border-radius:6px}
+#mf textarea{min-height:150px;resize:vertical}
+#mf .btn{width:100%}
+#mok{text-align:center;color:var(--te2);margin-top:1rem;min-height:1.6em}
 /* confirmation */
 #dlg{position:fixed;inset:0;z-index:60;background:#3b2418d9;display:flex;align-items:center;justify-content:center;padding:1rem;overflow:auto}
 #dlg[hidden],#res[hidden],#spw[hidden],#f[hidden]{display:none}
@@ -221,10 +229,10 @@ footer .hash{font:500 .8rem Cinzel,serif;letter-spacing:.22em}
     <div class="kick rv">GALERIE</div>
     <h2 class="words">Nos plus beaux instants</h2>
     <div class="gal">
-      <figure class="g"><img src="photos/galerie-1.jpg" alt="Échange des vœux à l'église" loading="lazy"></figure>
-      <figure class="g"><img src="photos/galerie-2.jpg" alt="Les mariés en tenue traditionnelle verte" loading="lazy"></figure>
-      <figure class="g"><img src="photos/galerie-3.jpg" alt="Les mariés dans le jardin" loading="lazy"></figure>
-      <figure class="g"><img src="photos/galerie-4.jpg" alt="Les mariés à l'état civil" loading="lazy"></figure>
+      <figure class="g big rv"><div class="ph"><img src="photos/galerie-1.jpg" alt="Échange des vœux à l'église" loading="lazy"></div></figure>
+      <figure class="g  rv"><div class="ph"><img src="photos/galerie-2.jpg" alt="Les mariés en tenue traditionnelle verte" loading="lazy"></div></figure>
+      <figure class="g dec rv"><div class="ph"><img src="photos/galerie-3.jpg" alt="Les mariés dans le jardin" loading="lazy"></div></figure>
+      <figure class="g big rv"><div class="ph"><img src="photos/galerie-4.jpg" alt="Les mariés à l'état civil" loading="lazy"></div></figure>
     </div>
   </section>
 
@@ -259,6 +267,19 @@ footer .hash{font:500 .8rem Cinzel,serif;letter-spacing:.22em}
     <div class="orn"></div>
     <p class="limite rv">Merci de répondre avant le <b id="lim"></b></p>
     <p class="rv"><button class="btn" id="rsvpBtn">Confirmer ma présence</button></p>
+  </section>
+
+  <section id="mot" class="c">
+    <div class="kick rv">LIVRE D'OR</div>
+    <h2 class="words">Un mot pour nous</h2>
+    <div class="orn"></div>
+    <p class="rv" style="max-width:34ch;margin:0 auto 1.6rem">Laissez-nous un message : nous le lirons avec beaucoup d'émotion.</p>
+    <form id="mf" class="rv">
+      <input id="mn" required maxlength="80" placeholder="Votre nom" autocomplete="name">
+      <textarea id="mm" required maxlength="600" placeholder="Votre message pour les mariés…"></textarea>
+      <button class="btn" type="submit">Envoyer mon message</button>
+      <p id="mok" role="status"></p>
+    </form>
   </section>
 
   <footer>
@@ -334,7 +355,7 @@ function onScroll(){tk=false;const vh=innerHeight;
   const r=tl.getBoundingClientRect();line.style.transform="scaleY("+Math.min(1,Math.max(0,(vh*.7-r.top)/r.height))+")";
   document.querySelectorAll(".ev").forEach(e=>{if(e.getBoundingClientRect().top<vh*.7)e.classList.add("in")});
   if(still)return;
-  imgs.forEach(im=>{const b=im.parentNode.getBoundingClientRect();im.style.transform="translateY("+((b.top+b.height/2-vh/2)*-.12).toFixed(1)+"px)"});
+  imgs.forEach(im=>{const b=im.parentNode.getBoundingClientRect();im.style.transform="translateY("+((b.top+b.height/2-vh/2)*-.06).toFixed(1)+"px)"});
   if(scrollY<vh)bg.style.transform="translateY("+scrollY*.25+"px) scale(1.08)";}
 addEventListener("scroll",()=>{if(!tk){tk=true;requestAnimationFrame(onScroll)}},{passive:true});
 
@@ -392,6 +413,12 @@ fm.onsubmit=async e=>{e.preventDefault();
   const msg=`Bonjour, je suis ${nom}${sp?" (avec "+sp+")":""}. Je confirme ma présence au mariage de ${CFG.prenoms[0]} et ${CFG.prenoms[1]} le ${CFG.dateTexte}. Nombre de personnes : ${n} (${n===2?"marié(e)":"célibataire"}).`;
   $("wa").href="https://wa.me/"+CFG.whatsapp+"?text="+encodeURIComponent(msg);
   fm.hidden=true;res.hidden=false;};
+
+/* livre d'or */
+$("mf").onsubmit=e=>{e.preventDefault();const bt=e.target.querySelector("button"),nom=$("mn").value.trim(),message=$("mm").value.trim();
+  if(!nom||!message)return;bt.disabled=true;
+  if(CFG.sheetUrl)fetch(CFG.sheetUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({type:"message",nom,message})}).catch(()=>{});
+  e.target.reset();$("mok").textContent="Merci, votre message nous a bien été transmis.";setTimeout(()=>bt.disabled=false,4000)};
 
 /* ouverture de l'enveloppe */
 $("openBtn").onclick=()=>{
