@@ -37,7 +37,8 @@ const CFG = {
   lieuRecherche: "Kinshasa Mall, Kinshasa",          // texte utilisé par Google Maps
   tenue: "Élégance et raffinement. Nous vous invitons à porter les couleurs de notre palette, ou du wax chic pour célébrer avec nous.",
   couleurs: [ ["#f3e9d8", "Crème"], ["#b9583a", "Terracotta"], ["#3b2418", "Brun profond"] ],
-  rsvpLien: "https://forms.gle/VOTRE-LIEN",       // lien de votre formulaire (Google Forms, etc.)
+  sheetUrl: "https://script.google.com/macros/s/AKfycbwU0236h2qUPPL-xP_8MQRX-BGsKPHmcj88J8DsopPkpEmfnKjXetdvH3wUOj1z6qnaAA/exec",                                  // lien « Application Web » de Google Apps Script (liste des invités)
+  whatsapp: "243820479342",                      // VOTRE numéro WhatsApp : indicatif + numéro, sans + ni espaces (ex. 243812345678)
   rsvpDate: "20 février 2027",
   merci: "Merci de faire partie de notre histoire",
   musique: "musique/musique.mp3"                  // mettez un fichier mp3 doux dans le dossier « musique »
@@ -160,6 +161,19 @@ footer .hash{font:500 .8rem Cinzel,serif;letter-spacing:.22em}
 #mus svg{width:20px;height:20px}
 #mus.off .on,#mus:not(.off) .offi{display:none}
 
+/* confirmation */
+#dlg{position:fixed;inset:0;z-index:60;background:#3b2418d9;display:flex;align-items:center;justify-content:center;padding:1rem;overflow:auto}
+#dlg[hidden],#res[hidden],#spw[hidden],#f[hidden]{display:none}
+#dlg .box{position:relative;background:var(--cr);border-radius:10px;padding:1.8rem 1.4rem;width:min(100%,420px);max-height:94svh;overflow:auto}
+#dlg h3{font-size:2.4rem;text-align:center;color:var(--te2);line-height:1.1;margin-bottom:1rem}
+#dlg label{display:block;font:500 .72rem Cinzel,serif;letter-spacing:.14em;margin-bottom:1rem}
+#dlg input[type=text],#dlg input:not([type]){display:block;width:100%;margin-top:.4rem;padding:.8rem;font:400 16px Jost,sans-serif;border:1px solid #b9583a66;border-radius:6px;background:#fff9}
+#dlg fieldset{border:0;margin-bottom:1rem}
+#dlg .rd{display:flex;gap:.6rem;align-items:center;font:400 1rem Jost,sans-serif;letter-spacing:0;padding:.35rem 0}
+#dlg .rd input{accent-color:var(--te);width:1.1rem;height:1.1rem}
+#dlg .btn{display:block;width:100%;text-align:center;margin-top:.8rem}
+#dlg .x{position:absolute;right:.6rem;top:.3rem;background:none;border:0;font-size:2rem;color:var(--br2);cursor:pointer;line-height:1}
+#cv{width:100%;height:auto;border-radius:6px;margin:.8rem 0;box-shadow:0 4px 14px #3b24182a}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*:before,*:after{transition:none!important;animation:none!important}
@@ -244,7 +258,7 @@ footer .hash{font:500 .8rem Cinzel,serif;letter-spacing:.22em}
     <h2 class="words">Serez-vous des nôtres ?</h2>
     <div class="orn"></div>
     <p class="limite rv">Merci de répondre avant le <b id="lim"></b></p>
-    <p class="rv"><a class="btn" id="rsvpBtn" target="_blank" rel="noopener">Confirmer ma présence</a></p>
+    <p class="rv"><button class="btn" id="rsvpBtn">Confirmer ma présence</button></p>
   </section>
 
   <footer>
@@ -254,6 +268,23 @@ footer .hash{font:500 .8rem Cinzel,serif;letter-spacing:.22em}
   </footer>
 </main>
 
+<div id="dlg" role="dialog" aria-modal="true" hidden><div class="box">
+  <button class="x" id="dx" aria-label="Fermer">&times;</button>
+  <form id="f">
+    <h3 class="script">Je confirme ma présence</h3>
+    <label>Votre nom complet<input id="fn" required autocomplete="name" placeholder="Ex. Joie Kayembe"></label>
+    <fieldset><label class="rd"><input type="radio" name="st" value="1" checked> Célibataire (1 personne)</label>
+    <label class="rd"><input type="radio" name="st" value="2"> Marié(e) (2 personnes)</label></fieldset>
+    <label id="spw" hidden>Nom de votre conjoint(e)<input id="sp" placeholder="Prénom et nom"></label>
+    <button class="btn" type="submit">Créer ma carte</button>
+  </form>
+  <div id="res" hidden>
+    <p class="c">Voici votre carte d'invitation. Envoyez maintenant votre confirmation aux mariés.</p>
+    <canvas id="cv"></canvas>
+    <a class="btn" id="wa" target="_blank" rel="noopener">Envoyer sur WhatsApp</a>
+    <a class="btn out" id="dl" download="invitation.png">Télécharger ma carte</a>
+  </div>
+</div></div>
 <button id="mus" class="off" aria-label="Activer ou couper la musique">
   <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>
   <svg class="offi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/><path d="M3 3l18 18"/></svg>
@@ -276,7 +307,7 @@ $("map").src="https://www.google.com/maps?q="+q+"&output=embed";
 $("itin").href="https://www.google.com/maps/dir/?api=1&destination="+q;
 $("tenueTxt").textContent=CFG.tenue;
 $("sw").innerHTML=CFG.couleurs.map(c=>`<div><span style="background:${c[0]}"></span>${c[1]}</div>`).join("");
-$("lim").textContent=CFG.rsvpDate; $("rsvpBtn").href=CFG.rsvpLien;
+$("lim").textContent=CFG.rsvpDate; 
 $("merci").textContent=CFG.merci; $("ini").textContent=CFG.initiales; $("hash").textContent=CFG.hashtag;
 
 /* titres mot par mot */
@@ -320,6 +351,42 @@ mus.onclick=()=>{const off=mus.classList.toggle("off");
   if(mode==="a")off?audio.pause():audio.play();
   else if(mode==="c")off?ctx.suspend():ctx.resume();
   else startMusic();};
+
+/* confirmation de présence + carte */
+const dlg=$("dlg"),fm=$("f"),res=$("res"),spw=$("spw");
+$("rsvpBtn").onclick=()=>{dlg.hidden=false;fm.hidden=false;res.hidden=true};
+$("dx").onclick=()=>dlg.hidden=true;
+dlg.onclick=e=>{if(e.target===dlg)dlg.hidden=true};
+fm.querySelectorAll("[name=st]").forEach(r=>r.onchange=()=>{spw.hidden=fm.st.value!=="2"});
+async function carte(nom,sp,n){
+  await Promise.all(['110px "Pinyon Script"','34px Cinzel','50px "Bodoni Moda"','34px Jost'].map(f=>document.fonts.load(f).catch(()=>{})));
+  const cv=$("cv"),c=cv.getContext("2d");cv.width=1080;cv.height=1500;
+  c.fillStyle="#f6efe4";c.fillRect(0,0,1080,1500);
+  c.strokeStyle="#b9583a";c.lineWidth=5;c.strokeRect(40,40,1000,1420);c.lineWidth=1.5;c.strokeRect(62,62,956,1376);
+  c.textAlign="center";
+  const t=(x,font,col,y,max)=>{let px=+font.match(/\d+/)[0];c.fillStyle=col;do{c.font=font.replace(/\d+/,px);px-=4}while(max&&c.measureText(x).width>max&&px>20);c.fillText(x,540,y)};
+  t("VOUS ÊTES INVITÉ(E)","34px Cinzel","#b9583a",250);
+  t(nom,"120px 'Pinyon Script'","#3b2418",400,880);
+  let y=400;if(sp){y=500;t("& "+sp,"90px 'Pinyon Script'","#3b2418",y,880)}
+  t("à célébrer le mariage de","34px Jost","#6b4a38",y+110);
+  t(CFG.prenoms[0],"150px 'Pinyon Script'","#b9583a",y+260);
+  t("&","80px 'Pinyon Script'","#b9583a",y+340);
+  t(CFG.prenoms[1],"150px 'Pinyon Script'","#b9583a",y+470,880);
+  c.fillStyle="#b9583a";c.fillRect(490,y+540,100,2);
+  t(CFG.dateTexte,"50px 'Bodoni Moda'","#3b2418",y+630,880);
+  t(CFG.lieuNom.toUpperCase(),"36px Cinzel","#3b2418",y+700,880);
+  t(n+(n>1?" personnes":" personne"),"34px Jost","#6b4a38",y+780);
+  t(CFG.hashtag,"30px Cinzel","#b9583a",1380);
+  $("dl").href=cv.toDataURL("image/png");
+}
+fm.onsubmit=async e=>{e.preventDefault();
+  const nom=$("fn").value.trim(),n=+fm.st.value,sp=n===2?$("sp").value.trim():"";
+  if(!nom)return;
+  await carte(nom,sp,n);
+  const msg=`Bonjour, je suis ${nom}${sp?" (avec "+sp+")":""}. Je confirme ma présence au mariage de ${CFG.prenoms[0]} et ${CFG.prenoms[1]} le ${CFG.dateTexte}. Nombre de personnes : ${n} (${n===2?"marié(e)":"célibataire"}).`;
+  if(CFG.sheetUrl)fetch(CFG.sheetUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({nom,statut:n===2?"Marié(e)":"Célibataire",conjoint:sp,personnes:n})}).catch(()=>{});
+  $("wa").href="https://wa.me/"+CFG.whatsapp+"?text="+encodeURIComponent(msg);
+  fm.hidden=true;res.hidden=false;};
 
 /* ouverture de l'enveloppe */
 $("openBtn").onclick=()=>{
