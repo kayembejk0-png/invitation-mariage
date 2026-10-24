@@ -37,7 +37,7 @@ const CFG = {
   lieuRecherche: "Kinshasa Mall, Kinshasa",          // texte utilisé par Google Maps
   tenue: "Élégance et raffinement. Nous vous invitons à porter les couleurs de notre palette, ou du wax chic pour célébrer avec nous.",
   couleurs: [ ["#f3e9d8", "Crème"], ["#b9583a", "Terracotta"], ["#3b2418", "Brun profond"] ],
-  sheetUrl: "https://script.google.com/macros/s/AKfycbxcA0PKog0Vp1ivXXT3gm9zVijkXDdRZk-DpRU3Fzw4ygPywCx7mw7W6nE0GVh43uCFlg/exec",                                  // lien « Application Web » de Google Apps Script (liste des invités)
+  sheetUrl: "https://script.google.com/macros/s/AKfycbwXXZjW1RKQCd_mNhksZxu7a-XFWN7pxp2r1gvhLfNubVN-4Ao-A-Y-k8IFWKhKb6AJcg/exec",                                  // lien « Application Web » de Google Apps Script (liste des invités)
   whatsapp: "243820479342",                      // VOTRE numéro WhatsApp : indicatif + numéro, sans + ni espaces (ex. 243812345678)
   rsvpDate: "20 février 2027",
   merci: "Merci de faire partie de notre histoire",
@@ -382,9 +382,14 @@ async function carte(nom,sp,n){
 fm.onsubmit=async e=>{e.preventDefault();
   const nom=$("fn").value.trim(),n=+fm.st.value,sp=n===2?$("sp").value.trim():"";
   if(!nom)return;
+  const bt=fm.querySelector("button[type=submit]");bt.disabled=true;bt.textContent="Vérification…";
+  let d=$("dup");if(!d){d=document.createElement("p");d.id="dup";d.style.cssText="color:#8f3f27;text-align:center;margin-top:.8rem";fm.append(d)}
+  d.textContent="";let doublon=false;
+  if(CFG.sheetUrl){try{const r=await fetch(CFG.sheetUrl,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({nom,statut:n===2?"Marié(e)":"Célibataire",conjoint:sp,personnes:n})});doublon=(await r.json()).statut==="doublon"}catch(e){}}
+  bt.disabled=false;bt.textContent="Créer ma carte";
+  if(doublon){d.textContent="Vous êtes déjà enregistré(e). Merci, votre présence est bien notée.";return}
   await carte(nom,sp,n);
   const msg=`Bonjour, je suis ${nom}${sp?" (avec "+sp+")":""}. Je confirme ma présence au mariage de ${CFG.prenoms[0]} et ${CFG.prenoms[1]} le ${CFG.dateTexte}. Nombre de personnes : ${n} (${n===2?"marié(e)":"célibataire"}).`;
-  if(CFG.sheetUrl)fetch(CFG.sheetUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({nom,statut:n===2?"Marié(e)":"Célibataire",conjoint:sp,personnes:n})}).catch(()=>{});
   $("wa").href="https://wa.me/"+CFG.whatsapp+"?text="+encodeURIComponent(msg);
   fm.hidden=true;res.hidden=false;};
 
