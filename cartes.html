@@ -65,8 +65,8 @@ async function carte(nom,sp,n){
   c.textAlign="center";
   const t=(x,font,col,y,max)=>{let px=+font.match(/\d+/)[0];c.fillStyle=col;do{c.font=font.replace(/\d+/,px);px-=4}while(max&&c.measureText(x).width>max&&px>20);c.fillText(x,540,y)};
   t("VOUS ÊTES INVITÉ(E)","34px Cinzel","#b9583a",250);
-  t(nom,"80px 'Bodoni Moda'","#3b2418",400,880);
-  let y=400;if(sp){y=500;t("& "+sp,"60px 'Bodoni Moda'","#3b2418",y,880)}
+  t(nom,"80px 'Cinzel'","#3b2418",400,880);
+  let y=400;if(sp){y=500;t("& "+sp,"60px 'Cinzel'","#3b2418",y,880)}
   t("à célébrer le mariage de","34px Jost","#6b4a38",y+110);
   t(CFG.prenoms[0],"150px 'Pinyon Script'","#b9583a",y+260);
   t("&","80px 'Pinyon Script'","#b9583a",y+340);
