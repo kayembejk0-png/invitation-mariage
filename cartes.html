@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Créer les cartes d'invitation</title>
+<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Bodoni+Moda:wght@400&family=Cinzel:wght@400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script>
+/* ===== À MODIFIER ===== */
+const CFG={
+  prenoms:["Joie","Emmanuella"],
+  hashtag:"#JoieEtEmmanuella",
+  dateTexte:"Samedi 20 mars 2027 à 20h",
+  lieuNom:"Kinshasa Mall",
+  code:"mariage2027",                       // code d'accès à cette page : changez-le
+  lienSite:"https://VOTRE-SITE.vercel.app"  // lien de votre invitation, ajouté au message WhatsApp
+};
+</script>
+<style>
+:root{--cr:#f6efe4;--te:#b9583a;--te2:#8f3f27;--br:#3b2418;--br2:#6b4a38}
+*{box-sizing:border-box;margin:0}
+body{background:var(--cr);color:var(--br);font:300 1.05rem/1.6 Jost,sans-serif;padding:2rem 1.2rem 4rem;max-width:520px;margin:auto}
+h1{font:400 2.6rem "Pinyon Script",cursive;color:var(--te2);text-align:center;line-height:1.1}
+p.s{text-align:center;color:var(--br2);margin:.6rem 0 1.6rem}
+label{display:block;font:500 .72rem Cinzel,serif;letter-spacing:.14em;margin-bottom:.4rem}
+textarea,input{width:100%;padding:.8rem;font:400 16px Jost,sans-serif;border:1px solid #b9583a66;border-radius:6px;background:#fff9;color:var(--br)}
+textarea{min-height:130px;resize:vertical}
+.btn{display:block;width:100%;text-align:center;margin-top:1rem;font:500 .85rem Cinzel,serif;letter-spacing:.18em;background:var(--te);color:var(--cr);padding:1rem;border:0;border-radius:50px;text-decoration:none;cursor:pointer}
+.btn.out{background:transparent;color:var(--te2);border:1px solid var(--te)}
+.card{margin-top:1.6rem;padding-top:1.2rem;border-top:1px solid #b9583a40}
+.card img{width:100%;border-radius:6px;box-shadow:0 4px 14px #3b24182a}
+.card h2{font:500 .85rem Cinzel,serif;letter-spacing:.12em;margin-bottom:.6rem}
+#gate{position:fixed;inset:0;background:var(--cr);z-index:5;display:flex;flex-direction:column;justify-content:center;padding:2rem;max-width:520px;margin:auto}
+#gate[hidden]{display:none}
+#err{color:var(--te2);text-align:center;margin-top:.6rem;min-height:1.5em}
+</style>
+</head>
+<body>
+<div id="gate">
+  <h1>Espace des mariés</h1>
+  <p class="s">Entrez le code d'accès</p>
+  <input id="cd" type="password" placeholder="Code" autocomplete="off">
+  <button class="btn" id="go">Entrer</button>
+  <div id="err"></div>
+</div>
+
+<h1>Cartes d'invitation</h1>
+<p class="s">Écrivez un invité ou un couple par ligne. Pour un couple, séparez les deux noms par le signe &amp;.</p>
+<label for="ls">Liste des invités</label>
+<textarea id="ls" placeholder="Joie Kayembe&#10;Marie Mukendi &amp; Paul Mukendi&#10;Grâce Ilunga"></textarea>
+<button class="btn" id="mk">Créer les cartes</button>
+<div id="out"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+$("go").onclick=()=>{if($("cd").value===CFG.code)$("gate").hidden=true;else $("err").textContent="Code incorrect"};
+$("cd").onkeydown=e=>{if(e.key==="Enter")$("go").click()};
+
+async function carte(nom,sp,n){
+  await Promise.all(['110px "Pinyon Script"','34px Cinzel','50px "Bodoni Moda"','34px Jost'].map(f=>document.fonts.load(f).catch(()=>{})));
+  const cv=document.createElement("canvas"),c=cv.getContext("2d");cv.width=1080;cv.height=1500;
+  c.fillStyle="#f6efe4";c.fillRect(0,0,1080,1500);
+  c.strokeStyle="#b9583a";c.lineWidth=5;c.strokeRect(40,40,1000,1420);c.lineWidth=1.5;c.strokeRect(62,62,956,1376);
+  c.textAlign="center";
+  const t=(x,font,col,y,max)=>{let px=+font.match(/\d+/)[0];c.fillStyle=col;do{c.font=font.replace(/\d+/,px);px-=4}while(max&&c.measureText(x).width>max&&px>20);c.fillText(x,540,y)};
+  t("VOUS ÊTES INVITÉ(E)","34px Cinzel","#b9583a",250);
+  t(nom,"120px 'Pinyon Script'","#3b2418",400,880);
+  let y=400;if(sp){y=500;t("& "+sp,"90px 'Pinyon Script'","#3b2418",y,880)}
+  t("à célébrer le mariage de","34px Jost","#6b4a38",y+110);
+  t(CFG.prenoms[0],"150px 'Pinyon Script'","#b9583a",y+260);
+  t("&","80px 'Pinyon Script'","#b9583a",y+340);
+  t(CFG.prenoms[1],"150px 'Pinyon Script'","#b9583a",y+470,880);
+  c.fillStyle="#b9583a";c.fillRect(490,y+540,100,2);
+  t(CFG.dateTexte,"50px 'Bodoni Moda'","#3b2418",y+630,880);
+  t(CFG.lieuNom.toUpperCase(),"36px Cinzel","#3b2418",y+700,880);
+  t(n+(n>1?" personnes":" personne"),"34px Jost","#6b4a38",y+780);
+  t(CFG.hashtag,"30px Cinzel","#b9583a",1380);
+  return new Promise(r=>cv.toBlob(r,"image/png"));
+}
+
+$("mk").onclick=async()=>{
+  const lignes=$("ls").value.split("\n").map(l=>l.trim()).filter(Boolean),out=$("out");
+  out.innerHTML="";
+  for(const l of lignes){
+    const [a,b]=l.split("&").map(x=>x.trim()),n=b?2:1;
+    const blob=await carte(a,b||"",n),url=URL.createObjectURL(blob);
+    const fichier="Invitation-"+(a+(b?"-"+b:"")).replace(/[^\wÀ-ÿ-]+/g,"_")+".png";
+    const d=document.createElement("div");d.className="card";
+    d.innerHTML=`<h2>${l.replace(/&/g,"&amp;")}</h2><img src="${url}" alt="Carte de ${a}">`;
+    const dl=document.createElement("a");dl.className="btn out";dl.textContent="Télécharger";dl.href=url;dl.download=fichier;
+    const sh=document.createElement("button");sh.className="btn";sh.textContent="Partager (WhatsApp…)";
+    sh.onclick=async()=>{
+      const file=new File([blob],fichier,{type:"image/png"});
+      const text=`Bonjour ${a}, nous avons la joie de vous inviter à notre mariage. Retrouvez tous les détails ici : ${CFG.lienSite}`;
+      if(navigator.canShare&&navigator.canShare({files:[file]}))try{await navigator.share({files:[file],text});return}catch(e){return}
+      window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");
+    };
+    d.append(sh,dl);out.append(d);
+  }
+};
+</script>
+</body>
+</html>
